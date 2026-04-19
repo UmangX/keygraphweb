@@ -1,0 +1,79 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#main-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  background: #eee;
+  overflow: hidden;
+}
+
+#bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  z-index: 100;
+
+  /* GitHub Dark Theme Palette */
+  background-color: #0d1117;
+  border-top: 1px solid #30363d;
+  color: #c9d1d9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* Layout: |--text--|------input------|--button--| */
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+#bar span {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+#bar input {
+  flex-grow: 1;
+  /* Makes input take up remaining space */
+  background-color: #010409;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #f0f6fc;
+  padding: 5px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+#bar input:focus {
+  border-color: #1f6feb;
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.3);
+}
+
+#bar button {
+  background-color: #238636;
+  /* GitHub green */
+  color: #ffffff;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  border-radius: 6px;
+  padding: 5px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#bar button:hover {
+  background-color: #2ea043;
+}
