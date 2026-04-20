@@ -46,11 +46,31 @@ function drawGrid() {
       dotlayer.add(dot);
     }
   }
-
-
   dotlayer.draw();
 }
 drawGrid()
+
+const SelectionLayer = new Konva.Layer();
+stage.add(SelectionLayer);
+function drawSelectionLayer() {
+  SelectionLayer.destroyChildren();
+  const w = stage.width();
+  const h = stage.height();
+  for (let i = 0; i <= w; i += grid_gap) {
+    for (let j = 0; j <= h; j += grid_gap) {
+      // draw rectangles based on gap
+      const previewRect = new Konva.Rect({
+        x: i,
+        y: j,
+        height: 10,
+        width: 10,
+        fill: "#fafbfc",
+      })
+      SelectionLayer.add(previewRect)
+    }
+  }
+  SelectionLayer.draw();
+}
 
 const layer = new Konva.Layer();
 stage.add(layer);
@@ -60,6 +80,7 @@ function getRandomInt(min, max) {
 }
 
 function handlesubmit() {
+
   const value = input.value.trim();
   if (value === "") return;
 
@@ -107,10 +128,10 @@ function handlesubmit() {
 effect(() => {
   modeDisplay.textContent = modalMode.value;
   if (modalMode.value == mode.EDIT) {
-    //
+    drawSelectionLayer();
   }
   if (modalMode.value == mode.VIEW) {
-    //
+    SelectionLayer.destroyChildren();
   }
 })
 
@@ -141,7 +162,8 @@ effect(() => {
 // })
 
 //event handling
-//TODO focus on canvas in focus mode
+
+
 tinykeys(window, {
   "Escape": () => {
     if (modalMode.value === mode.EDIT) {
