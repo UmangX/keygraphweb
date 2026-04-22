@@ -1,3 +1,5 @@
+import Konva from "konva";
+
 export const stage = new Konva.Stage({
   container: 'main-canvas',
   width: window.innerWidth,
@@ -8,5 +10,5 @@ export const stageSetup = () => {
   stage.container().style.backgroundColor = '#0d1117';
 }
 
-export const Primelayer = new Konva.Layer();
-stage.add(Primelayer);
+export const primeLayer = new Konva.Layer();
+stage.add(primeLayer);

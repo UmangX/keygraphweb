@@ -3,37 +3,26 @@ import Konva from 'konva';
 import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
 import { MODES, previewConfig, modalMode } from './srcSignals';
-import { stage, stageSetup, Primelayer } from './srcStage';
-import { gridConfig, drawGrid } from './srcGrid';
-import { drawSelectionLayer, SelectionLayer } from './srcSelection';
+import { stage, stageSetup, primeLayer } from './srcStage';
+import { drawGrid } from './srcGrid';
+import { addSelectionLayer, SelectionLayer, moveCursor } from './srcSelection';
 
 
 //dom elements
 const modeDisplay = document.getElementById("status-display")
 const input = document.getElementById("user-input");
 const submitbutton = document.getElementById("submit-btn");
-const infoWindow = document.getElementById("infobar")
+// const infoWindow = document.getElementById("infobar")
 
 stageSetup()
 drawGrid()
-drawSelectionLayer()
+addSelectionLayer()
 
 function handlesubmit() {
 
   const value = input.value.trim();
 
   if (value === "") return;
-
-  if (value == "/cursorreset") {
-    previewConfig.value = {
-      ...previewConfig.value,
-      cursor: {
-        x: window.innerWidth / 2,   // also these were swapped
-        y: window.innerHeight / 2,
-      }
-    };
-    return;
-  }
 
   const complexText = new Konva.Text({
     text: value,
@@ -65,28 +54,22 @@ function handlesubmit() {
 
   textgroup.add(rect)
   textgroup.add(complexText)
-  Primelayer.add(textgroup);
+  primeLayer.add(textgroup);
 
   input.value = "";
-  Primelayer.draw();
+  primeLayer.draw();
 }
 
 effect(() => {
   const _gap = previewConfig.value.gap;
   const _cx = previewConfig.value.cursor.x;
   const _cy = previewConfig.value.cursor.y;
-  drawSelectionLayer();
+  moveCursor()
 });
 
-let previewBlocks = []
 effect(() => {
   modeDisplay.textContent = modalMode.value;
-  if (modalMode.value === MODES.PREVIEW) {
-    drawSelectionLayer();
-    if (previewBlocks.length === 0) {
-      previewBlocks = SelectionLayer.getChildren()
-    }
-    infoWindow.innerText = previewBlocks.length.toString()
+  if (modalMode.value === MODES.PREVIEW || modalMode.value === MODES.EDIT) {
     SelectionLayer.show();
   } else {
     SelectionLayer.hide();
