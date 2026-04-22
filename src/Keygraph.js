@@ -1,85 +1,23 @@
 // @ts-check
 import Konva from 'konva';
-import { signal, effect } from '@preact/signals-core';
+import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
 import { MODES, previewConfig, modalMode } from './srcSignals';
+import { stage, stageSetup } from './srcStage';
+import { gridConfig, drawGrid } from './srcGrid';
+import { drawSelectionLayer, SelectionLayer } from './srcSelection';
+
+
+//dom elements
 const modeDisplay = document.getElementById("status-display")
-
-
-// domelements
 const input = document.getElementById("user-input");
 const submitbutton = document.getElementById("submit-btn");
+const infoWindow = document.getElementById("infobar")
 
-//konva setup
-const stage = new Konva.Stage({
-  container: 'main-canvas',
-  width: window.innerWidth,
-  height: window.innerHeight,
-});
-
-stage.container().style.backgroundColor = '#0d1117';
-
-const dotlayer = new Konva.Layer();
-stage.add(dotlayer);
-let grid_gap = 50;
-function drawGrid() {
-  dotlayer.destroyChildren();
-  const w = stage.width();
-  const h = stage.height();
-  for (let i = 0; i <= w; i += grid_gap) {
-    for (let j = 0; j <= h; j += grid_gap) {
-      const dot = new Konva.Circle({
-        x: i,
-        y: j,
-        radius: 3,
-        fill: '#0FBF3E',
-        listening: false,
-      });
-      dotlayer.add(dot);
-    }
-  }
-  dotlayer.draw();
-}
-
-
-
+stageSetup()
 drawGrid()
+drawSelectionLayer()
 
-// selection layer convert the number into homerow keys
-const SelectionLayer = new Konva.Layer();
-stage.add(SelectionLayer);
-
-function drawSelectionLayer() {
-  SelectionLayer.destroyChildren();
-  const w = stage.width();
-  const h = stage.height();
-  for (let i = 0; i <= w; i += previewConfig.value.gap) {
-    for (let j = 0; j <= h; j += previewConfig.value.gap) {
-      const previewRect = new Konva.Rect({
-        x: i,
-        y: j,
-        height: previewConfig.value.height,
-        width: previewConfig.value.width,
-        fill: "#868e96",
-        opacity: 0.1,
-      })
-      SelectionLayer.add(previewRect)
-    }
-  }
-  const cursorState = previewConfig.value.cursor
-  const cursorCircle = new Konva.Circle({
-    x: cursorState.x,
-    y: cursorState.y,
-    radius: 5,
-    fill: 'red',
-    draggable: true,
-  });
-  SelectionLayer.add(cursorCircle)
-  SelectionLayer.draw();
-}
-
-const layer = new Konva.Layer();
-stage.add(layer);
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
@@ -141,14 +79,6 @@ effect(() => {
   }
 });
 
-// effect(() => {
-//   const cx = previewConfig.value.cursor.x;
-//   const cy = previewConfig.value.cursor.y;
-//   // cursor with id cursor and update that specific node
-//   SelectionLayer.add()
-// })
-
-const infoWindow = document.getElementById("infobar")
 let previewBlocks = []
 
 effect(() => {
@@ -213,10 +143,10 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          x: previewConfig.value.cursor.x + 10
+          x: previewConfig.value.cursor.x + 30
         }
       };
-      console.log("decreased the cursos by 10")
+      console.log("decreased the cursos by 30")
     }
   },
   "h": () => {
@@ -225,10 +155,10 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          x: previewConfig.value.cursor.x - 10
+          x: previewConfig.value.cursor.x - 30
         }
       };
-      console.log("decreased the cursos by 10")
+      console.log("decreased the cursos by 30")
     }
   },
   "j": () => {
@@ -237,10 +167,10 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          y: previewConfig.value.cursor.y - 10
+          y: previewConfig.value.cursor.y - 30
         }
       };
-      console.log("decreased the cursos by 10")
+      console.log("decreased the cursos by 30")
     }
   },
   "k": () => {
@@ -249,10 +179,10 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          y: previewConfig.value.cursor.y + 10
+          y: previewConfig.value.cursor.y + 30
         }
       };
-      console.log("decreased the cursos by 10")
+      console.log("decreased the cursos by 30")
     }
   },
 
@@ -263,8 +193,6 @@ window.addEventListener('resize', () => {
   stage.height(window.innerHeight)
   drawGrid();
 })
-
-
 
 submitbutton.addEventListener('click', handlesubmit);
 
