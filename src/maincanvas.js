@@ -2,13 +2,7 @@
 import Konva from 'konva';
 import { signal, effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
-
-//signals
-const mode = {
-  VIEW: "VIEW",
-  EDIT: "EDIT",
-}
-const modalMode = signal(mode.VIEW);
+import { MODES, previewConfig, modalMode } from './srcSignals';
 const modeDisplay = document.getElementById("status-display")
 
 
@@ -27,9 +21,7 @@ stage.container().style.backgroundColor = '#0d1117';
 
 const dotlayer = new Konva.Layer();
 stage.add(dotlayer);
-
 let grid_gap = 50;
-
 function drawGrid() {
   dotlayer.destroyChildren();
   const w = stage.width();
@@ -39,7 +31,7 @@ function drawGrid() {
       const dot = new Konva.Circle({
         x: i,
         y: j,
-        radius: 2,
+        radius: 3,
         fill: '#0FBF3E',
         listening: false,
       });
@@ -48,27 +40,41 @@ function drawGrid() {
   }
   dotlayer.draw();
 }
+
+
+
 drawGrid()
 
+// selection layer convert the number into homerow keys
 const SelectionLayer = new Konva.Layer();
 stage.add(SelectionLayer);
+
 function drawSelectionLayer() {
   SelectionLayer.destroyChildren();
   const w = stage.width();
   const h = stage.height();
-  for (let i = 0; i <= w; i += grid_gap) {
-    for (let j = 0; j <= h; j += grid_gap) {
-      // draw rectangles based on gap
+  for (let i = 0; i <= w; i += previewConfig.value.gap) {
+    for (let j = 0; j <= h; j += previewConfig.value.gap) {
       const previewRect = new Konva.Rect({
         x: i,
         y: j,
-        height: 10,
-        width: 10,
-        fill: "#fafbfc",
+        height: previewConfig.value.height,
+        width: previewConfig.value.width,
+        fill: "#868e96",
+        opacity: 0.1,
       })
       SelectionLayer.add(previewRect)
     }
   }
+  const cursorState = previewConfig.value.cursor
+  const cursorCircle = new Konva.Circle({
+    x: cursorState.x,
+    y: cursorState.y,
+    radius: 5,
+    fill: 'red',
+    draggable: true,
+  });
+  SelectionLayer.add(cursorCircle)
   SelectionLayer.draw();
 }
 
@@ -123,60 +129,133 @@ function handlesubmit() {
   layer.draw();
 }
 
-// effects
+// effects and events
+let exGap = previewConfig.value.gap;
+effect(() => {
+  const currentGap = previewConfig.value.gap;
+  if (currentGap !== exGap) {
+    exGap = currentGap;
+    if (modalMode.value === MODES.PREVIEW) {
+      drawSelectionLayer();
+    }
+  }
+});
+
+// effect(() => {
+//   const cx = previewConfig.value.cursor.x;
+//   const cy = previewConfig.value.cursor.y;
+//   // cursor with id cursor and update that specific node
+//   SelectionLayer.add()
+// })
+
+const infoWindow = document.getElementById("infobar")
+let previewBlocks = []
 
 effect(() => {
   modeDisplay.textContent = modalMode.value;
-  if (modalMode.value == mode.EDIT) {
+  if (modalMode.value === MODES.PREVIEW) {
     drawSelectionLayer();
-  }
-  if (modalMode.value == mode.VIEW) {
-    SelectionLayer.destroyChildren();
+    if (previewBlocks.length === 0) {
+      previewBlocks = SelectionLayer.getChildren()
+    }
+    infoWindow.innerText = previewBlocks.length.toString()
+    SelectionLayer.show();
+  } else {
+    SelectionLayer.hide();
   }
 })
 
-
-// const idLayer = new Konva.Layer()
-// stage.add(idLayer)
-// effect(() => {
-//   modeDisplay.textContent = modalMode.value
-
-//   if (modalMode.value == 'COMMAND') {
-//     idLayer.destroyChildren();
-//     layer.getChildren().forEach(node => {
-//       const idText = new Konva.Text({
-//         x: node.x(),
-//         y: node.y(),
-//         fontSize: 10,
-//         fontFamily: 'Hermit,-apple-system, system-ui,sans-serif',
-//         fill: '#c9d1d9', // GitHub text color
-//         text: node.id() || "NO ID",
-//         listening: false,
-//       });
-//       console.log("adding element")
-//       console.log(node.id())
-//       idLayer.add(idText);
-//     })
-//     idLayer.draw();
-//   }
-// })
-
-//event handling
-
-
 tinykeys(window, {
+  // view MODES keybindings
   "Escape": () => {
-    if (modalMode.value === mode.EDIT) {
-      modalMode.value = mode.VIEW;
+    if (modalMode.value !== MODES.VIEW) {
+      modalMode.value = MODES.VIEW;
       document.getElementById('main-canvas').focus()
     }
   },
+
+  // edit MODES keybindings
   "Space e": () => {
-    if (modalMode.value === mode.VIEW) {
-      modalMode.value = mode.EDIT;
+    if (modalMode.value !== MODES.EDIT) {
+      modalMode.value = MODES.EDIT
       document.getElementById("user-input").focus();
     }
   },
+
+  // preview MODES keybindings
+  "Space p": () => {
+    if (modalMode.value !== MODES.PREVIEW) {
+      modalMode.value = MODES.PREVIEW;
+      document.getElementById('main-canvas').focus()
+    }
+  },
+  "Space =": () => {
+    if (modalMode.value === MODES.PREVIEW) {
+      previewConfig.value = {
+        ...previewConfig.value,
+        gap: previewConfig.value.gap + 10
+      };
+      console.log("increased the previewGap by 10")
+    }
+  },
+  "Space -": () => {
+    if (modalMode.value === MODES.PREVIEW) {
+      previewConfig.value = {
+        ...previewConfig.value,
+        gap: previewConfig.value.gap - 10
+      };
+      console.log("decreased the previewGap by 10")
+    }
+  },
+  "l": () => {
+    if (modalMode.value === MODES.PREVIEW) {
+      previewConfig.value = {
+        ...previewConfig.value,
+        cursor: {
+          ...previewConfig.value.cursor,
+          x: previewConfig.value.cursor.x + 10
+        }
+      };
+      console.log("decreased the cursos by 10")
+    }
+  },
+  "h": () => {
+    if (modalMode.value === MODES.PREVIEW) {
+      previewConfig.value = {
+        ...previewConfig.value,
+        cursor: {
+          ...previewConfig.value.cursor,
+          x: previewConfig.value.cursor.x - 10
+        }
+      };
+      console.log("decreased the cursos by 10")
+    }
+  },
+  "j": () => {
+    if (modalMode.value === MODES.PREVIEW) {
+      previewConfig.value = {
+        ...previewConfig.value,
+        cursor: {
+          ...previewConfig.value.cursor,
+          y: previewConfig.value.cursor.y - 10
+        }
+      };
+      console.log("decreased the cursos by 10")
+    }
+  },
+  "k": () => {
+    if (modalMode.value === MODES.PREVIEW) {
+      previewConfig.value = {
+        ...previewConfig.value,
+        cursor: {
+          ...previewConfig.value.cursor,
+          y: previewConfig.value.cursor.y + 10
+        }
+      };
+      console.log("decreased the cursos by 10")
+    }
+  },
+
 });
 
 window.addEventListener('resize', () => {
@@ -185,6 +264,8 @@ window.addEventListener('resize', () => {
   drawGrid();
 })
 
+
+
 submitbutton.addEventListener('click', handlesubmit);
 
 input.addEventListener('keydown', (e) => {
@@ -192,3 +273,27 @@ input.addEventListener('keydown', (e) => {
     handlesubmit();
   }
 });
+
+
+
+// // Zoom relative to pointer
+// var scaleBy = 1.05;
+// stage.on('wheel', function (e) {
+//   e.evt.preventDefault();
+//   var oldScale = stage.scaleX();
+//   var pointer = stage.getPointerPosition();
+//   var mousePointTo = {
+//     x: (pointer.x - stage.x()) / oldScale,
+//     y: (pointer.y - stage.y()) / oldScale,
+//   };
+//   var direction = e.evt.deltaY > 0 ? -1 : 1;
+//   if (e.evt.ctrlKey) { direction = -direction; }
+//   var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+//   newScale = Math.max(0.1, Math.min(10, newScale));
+//   stage.scale({ x: newScale, y: newScale });
+//   var newPos = {
+//     x: pointer.x - mousePointTo.x * newScale,
+//     y: pointer.y - mousePointTo.y * newScale,
+//   };
+//   stage.position(newPos);
+// });

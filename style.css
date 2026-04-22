@@ -77,3 +77,24 @@ html {
 #bar button:hover {
   background-color: #2ea043;
 }
+
+#infobar {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 120px;
+  height: 120px;
+  z-index: 50;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #f0f6fc;
+  font-family: 'Hermit', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 12px;
+}
