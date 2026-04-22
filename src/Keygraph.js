@@ -12,7 +12,7 @@ import { addSelectionLayer, SelectionLayer, moveCursor } from './srcSelection';
 const modeDisplay = document.getElementById("status-display")
 const input = document.getElementById("user-input");
 const submitbutton = document.getElementById("submit-btn");
-// const infoWindow = document.getElementById("infobar")
+const infoWindow = document.getElementById("infobar")
 
 stageSetup()
 drawGrid()
@@ -21,8 +21,6 @@ addSelectionLayer()
 function handlesubmit() {
 
   const value = input.value.trim();
-
-  if (value === "") return;
 
   const complexText = new Konva.Text({
     text: value,
@@ -61,9 +59,11 @@ function handlesubmit() {
 }
 
 effect(() => {
-  const _gap = previewConfig.value.gap;
   const _cx = previewConfig.value.cursor.x;
   const _cy = previewConfig.value.cursor.y;
+  const _moveby = previewConfig.value.cursor.moveByPoint;
+  infoWindow.innerHTML = String(previewConfig.value.cursor.moveByPoint);
+  console.log(previewConfig.value)
   moveCursor()
 });
 
@@ -76,11 +76,17 @@ effect(() => {
   }
 })
 
+// const notTyping = () => {
+//   const tag = document.activeElement?.tagName;
+//   return tag !== 'INPUT' && tag !== 'TEXTAREA';
+// }
+
 tinykeys(window, {
   // view MODES keybindings
   "Escape": () => {
     if (modalMode.value !== MODES.VIEW) {
       modalMode.value = MODES.VIEW;
+      input.blur()
       document.getElementById('main-canvas').focus()
     }
   },
@@ -97,6 +103,7 @@ tinykeys(window, {
   "Space p": () => {
     if (modalMode.value !== MODES.PREVIEW) {
       modalMode.value = MODES.PREVIEW;
+      input.blur()
       document.getElementById('main-canvas').focus()
     }
   },
@@ -104,17 +111,23 @@ tinykeys(window, {
     if (modalMode.value === MODES.PREVIEW) {
       previewConfig.value = {
         ...previewConfig.value,
-        gap: previewConfig.value.gap + 10
+        cursor: {
+          ...previewConfig.value.cursor,
+          moveByPoint: previewConfig.value.cursor.moveByPoint + 10,
+        }
       };
-      console.log("increased the previewGap by 10")
+      console.log("increased the cursor move by 10")
     }
   },
   "Space -": () => {
     if (modalMode.value === MODES.PREVIEW) {
       previewConfig.value = {
         ...previewConfig.value,
-        gap: previewConfig.value.gap - 10
-      };
+        cursor: {
+          ...previewConfig.value.cursor,
+          moveByPoint: previewConfig.value.cursor.moveByPoint - 10,
+        }
+      }
     }
   },
   "l": () => {
@@ -126,6 +139,7 @@ tinykeys(window, {
           x: previewConfig.value.cursor.x + previewConfig.value.cursor.moveByPoint
         }
       };
+      console.log(previewConfig.value.cursor.moveByPoint)
     }
   },
   "h": () => {
@@ -139,7 +153,7 @@ tinykeys(window, {
       };
     }
   },
-  "j": () => {
+  "k": () => {
     if (modalMode.value === MODES.PREVIEW) {
       previewConfig.value = {
         ...previewConfig.value,
@@ -150,7 +164,7 @@ tinykeys(window, {
       };
     }
   },
-  "k": () => {
+  "j": () => {
     if (modalMode.value === MODES.PREVIEW) {
       previewConfig.value = {
         ...previewConfig.value,
@@ -161,7 +175,6 @@ tinykeys(window, {
       };
     }
   },
-
 });
 
 window.addEventListener('resize', () => {
@@ -173,7 +186,7 @@ window.addEventListener('resize', () => {
 submitbutton.addEventListener('click', handlesubmit);
 
 input.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
+  if (e.key === 'Enter' && input.value.trim() !== "") {
     handlesubmit();
   }
 });
