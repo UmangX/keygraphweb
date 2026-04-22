@@ -5,6 +5,7 @@ export const SelectionLayer = new Konva.Layer();
 stage.add(SelectionLayer);
 
 export function drawSelectionLayer() {
+
   SelectionLayer.destroyChildren();
   const w = stage.width();
   const h = stage.height();
@@ -21,10 +22,10 @@ export function drawSelectionLayer() {
       SelectionLayer.add(previewRect)
     }
   }
-  const cursorState = previewConfig.value.cursor
   const cursorCircle = new Konva.Circle({
-    x: cursorState.x,
-    y: cursorState.y,
+    id: 'Cursor',
+    x: previewConfig.value.cursor.x,
+    y: previewConfig.value.cursor.y,
     radius: 5,
     fill: 'red',
     draggable: true,
@@ -32,6 +33,3 @@ export function drawSelectionLayer() {
   SelectionLayer.add(cursorCircle)
   SelectionLayer.draw();
 }
-
-const layer = new Konva.Layer();
-stage.add(layer);

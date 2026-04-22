@@ -3,7 +3,7 @@ import Konva from 'konva';
 import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
 import { MODES, previewConfig, modalMode } from './srcSignals';
-import { stage, stageSetup } from './srcStage';
+import { stage, stageSetup, Primelayer } from './srcStage';
 import { gridConfig, drawGrid } from './srcGrid';
 import { drawSelectionLayer, SelectionLayer } from './srcSelection';
 
@@ -18,18 +18,22 @@ stageSetup()
 drawGrid()
 drawSelectionLayer()
 
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
 function handlesubmit() {
 
   const value = input.value.trim();
+
   if (value === "") return;
 
-  const rx = getRandomInt(50, window.innerWidth - 350);
-  const ry = getRandomInt(50, window.innerHeight - 150);
+  if (value == "/cursorreset") {
+    previewConfig.value = {
+      ...previewConfig.value,
+      cursor: {
+        x: window.innerWidth / 2,   // also these were swapped
+        y: window.innerHeight / 2,
+      }
+    };
+    return;
+  }
 
   const complexText = new Konva.Text({
     text: value,
@@ -53,34 +57,28 @@ function handlesubmit() {
   });
 
   const textgroup = new Konva.Group({
-    x: rx,
-    y: ry,
+    x: previewConfig.value.cursor.x,
+    y: previewConfig.value.cursor.y,
     id: `node-${Date.now()}`,
     draggable: true,
   })
 
   textgroup.add(rect)
   textgroup.add(complexText)
-  layer.add(textgroup);
+  Primelayer.add(textgroup);
 
   input.value = "";
-  layer.draw();
+  Primelayer.draw();
 }
 
-// effects and events
-let exGap = previewConfig.value.gap;
 effect(() => {
-  const currentGap = previewConfig.value.gap;
-  if (currentGap !== exGap) {
-    exGap = currentGap;
-    if (modalMode.value === MODES.PREVIEW) {
-      drawSelectionLayer();
-    }
-  }
+  const _gap = previewConfig.value.gap;
+  const _cx = previewConfig.value.cursor.x;
+  const _cy = previewConfig.value.cursor.y;
+  drawSelectionLayer();
 });
 
 let previewBlocks = []
-
 effect(() => {
   modeDisplay.textContent = modalMode.value;
   if (modalMode.value === MODES.PREVIEW) {
@@ -134,7 +132,6 @@ tinykeys(window, {
         ...previewConfig.value,
         gap: previewConfig.value.gap - 10
       };
-      console.log("decreased the previewGap by 10")
     }
   },
   "l": () => {
@@ -143,10 +140,9 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          x: previewConfig.value.cursor.x + 30
+          x: previewConfig.value.cursor.x + previewConfig.value.cursor.moveByPoint
         }
       };
-      console.log("decreased the cursos by 30")
     }
   },
   "h": () => {
@@ -155,10 +151,9 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          x: previewConfig.value.cursor.x - 30
+          x: previewConfig.value.cursor.x - previewConfig.value.cursor.moveByPoint,
         }
       };
-      console.log("decreased the cursos by 30")
     }
   },
   "j": () => {
@@ -167,10 +162,9 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          y: previewConfig.value.cursor.y - 30
+          y: previewConfig.value.cursor.y - previewConfig.value.cursor.moveByPoint
         }
       };
-      console.log("decreased the cursos by 30")
     }
   },
   "k": () => {
@@ -179,10 +173,9 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          y: previewConfig.value.cursor.y + 30
+          y: previewConfig.value.cursor.y + previewConfig.value.cursor.moveByPoint
         }
       };
-      console.log("decreased the cursos by 30")
     }
   },
 
@@ -201,27 +194,3 @@ input.addEventListener('keydown', (e) => {
     handlesubmit();
   }
 });
-
-
-
-// // Zoom relative to pointer
-// var scaleBy = 1.05;
-// stage.on('wheel', function (e) {
-//   e.evt.preventDefault();
-//   var oldScale = stage.scaleX();
-//   var pointer = stage.getPointerPosition();
-//   var mousePointTo = {
-//     x: (pointer.x - stage.x()) / oldScale,
-//     y: (pointer.y - stage.y()) / oldScale,
-//   };
-//   var direction = e.evt.deltaY > 0 ? -1 : 1;
-//   if (e.evt.ctrlKey) { direction = -direction; }
-//   var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-//   newScale = Math.max(0.1, Math.min(10, newScale));
-//   stage.scale({ x: newScale, y: newScale });
-//   var newPos = {
-//     x: pointer.x - mousePointTo.x * newScale,
-//     y: pointer.y - mousePointTo.y * newScale,
-//   };
-//   stage.position(newPos);
-// });
