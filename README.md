@@ -1,7 +1,7 @@
 # keygraphweb
 
 ## this is a ai generated readme but enough to provide help for development
-
+<img width="1912" height="942" alt="Screenshot 2026-04-23 at 9 34 14 AM" src="https://github.com/user-attachments/assets/97a19f90-8c09-444b-b40c-6367c7ec26c4" />
 A keyboard-driven, canvas-based diagramming tool for the web. Inspired by Vim's modal editing philosophy, keygraphweb lets you place and arrange shapes on an infinite canvas entirely from your keyboard — no mouse required.
 
 ---
