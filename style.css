@@ -89,7 +89,49 @@ html {
   border: 1px solid #30363d;
   border-radius: 6px;
   color: #f0f6fc;
-  font-family: 'Hermit', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: 'SauceCodePro Nerd Font Mono', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+#shapeDisplay {
+  position: fixed;
+  top: 150px;
+  right: 16px;
+  width: 120px;
+  height: 120px;
+  z-index: 50;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #f0f6fc;
+  font-family: 'SauceCodePro Nerd Font Mono', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+#shapeSizeDisplay {
+  position: fixed;
+  top: 285px;
+  right: 16px;
+  width: 120px;
+  height: 120px;
+  z-index: 50;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #f0f6fc;
+  font-family: 'SauceCodePro Nerd Font Mono', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;

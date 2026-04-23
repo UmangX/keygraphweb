@@ -2,25 +2,25 @@ import { stage } from "./srcStage";
 import { previewConfig } from "./srcSignals";
 
 
-export const SelectionLayer = new Konva.Layer();
-export const addSelectionLayer = () => {
-  stage.add(SelectionLayer);
+export const PreviewLayer = new Konva.Layer();
+export const addpreviewLayer = () => {
+  stage.add(PreviewLayer);
 }
 
 export function moveCursor() {
-  let cursor = SelectionLayer.findOne('#Cursor');
+  let cursor = PreviewLayer.findOne('#Cursor');
   if (!cursor) {
     cursor = new Konva.Circle({
       id: 'Cursor',
       radius: 5,
-      fill: 'red',
+      fill: '#58a6ff',
       draggable: true,
     });
-    SelectionLayer.add(cursor);
+    PreviewLayer.add(cursor);
   }
   cursor.position({
     x: previewConfig.value.cursor.x,
     y: previewConfig.value.cursor.y,
   });
-  SelectionLayer.draw();
+  PreviewLayer.draw();
 }

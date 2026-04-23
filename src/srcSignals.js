@@ -6,8 +6,14 @@ export const MODES = {
   PREVIEW: "PREVIEW",
 };
 
-export const modalMode = signal(MODES.VIEW);
+export const SHAPES = {
+  TEXTBOX: "textbox",
+  CIRCLE: "circle",
+  LINE: "line",
+}
 
+export const modalMode = signal(MODES.VIEW);
+export const selectedShape = signal(SHAPES.TEXTBOX)
 export const previewConfig = signal({
   height: 30,
   width: 30,
