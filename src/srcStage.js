@@ -7,7 +7,7 @@ export const stage = new Konva.Stage({
 });
 
 export const stageSetup = () => {
-  stage.container().style.backgroundColor = '#0d1117';
+  stage.container().style.backgroundColor = '#111111';
 }
 
 export const primeLayer = new Konva.Layer();

@@ -20,6 +20,6 @@ export const previewConfig = signal({
   cursor: {
     x: window.innerWidth / 2, // Fixed: x should typically align with width
     y: window.innerHeight / 2,
-    moveByPoint: 50,
-  }
+  },
 });
+export const cursorJump = signal(100);

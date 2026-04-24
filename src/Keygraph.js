@@ -2,13 +2,12 @@
 import Konva from 'konva';
 import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
-import { MODES, previewConfig, modalMode, selectedShape, SHAPES } from './srcSignals';
+import { MODES, previewConfig, modalMode, selectedShape, SHAPES, cursorJump } from './srcSignals';
 import { stage, stageSetup, primeLayer } from './srcStage';
 import { drawGrid } from './srcGrid';
 import { addpreviewLayer, PreviewLayer, moveCursor } from './srcPreview';
 import { generateTextbox } from './srcNodes';
 import { nanoid } from 'nanoid';
-
 
 //dom elements
 const modeDisplay = document.getElementById("status-display")
@@ -17,6 +16,7 @@ const submitbutton = document.getElementById("submit-btn");
 const infoWindow = document.getElementById("infobar")
 const shapeDisplayWindow = document.getElementById("shapeDisplay")
 const shapeSizeDisplayWindow = document.getElementById("shapeSizeDisplay")
+
 
 stageSetup()
 drawGrid()
@@ -53,12 +53,16 @@ function handlesubmit() {
 //     r2.y + r2.height < r1.y
 //   );
 // }
+
+effect(() => {
+  //startup functions
+  primeLayer.add(generateTextbox("Welcome to Keygraph,!", 10, 10));
+})
+
 effect(() => {
   const _cshape = selectedShape.value;
   shapeDisplayWindow.innerHTML = String(selectedShape.value);
-  // make preview if mode is ready
 });
-
 
 effect(() => {
   const _cwidth = previewConfig.value.width;
@@ -66,15 +70,16 @@ effect(() => {
   shapeSizeDisplayWindow.innerHTML = String(_cwidth + " " + _cheight);
 })
 
-
 effect(() => {
   const _cx = previewConfig.value.cursor.x;
   const _cy = previewConfig.value.cursor.y;
-  const _moveby = previewConfig.value.cursor.moveByPoint;
-  infoWindow.innerHTML = String(previewConfig.value.cursor.moveByPoint) + " pixel";
-  console.log(previewConfig.value)
   moveCursor()
 });
+
+effect(() => {
+  const _cursorJump = cursorJump.value;
+  infoWindow.innerHTML = String(cursorJump.value) + " pixel";
+})
 
 effect(() => {
   modeDisplay.textContent = modalMode.value;
@@ -91,16 +96,14 @@ effect(() => {
 // }
 
 tinykeys(window, {
-  // view MODES keybindings
+  // edit MODES keybindings
   "Escape": () => {
-    if (modalMode.value !== MODES.VIEW) {
-      modalMode.value = MODES.VIEW;
-      input.blur()
-      document.getElementById('main-canvas').focus()
+    if (modalMode.value !== MODES.EDIT) {
+      modalMode.value = MODES.EDIT
+      document.getElementById("user-input").focus();
     }
   },
 
-  // edit MODES keybindings
   "Space e": () => {
     if (modalMode.value !== MODES.EDIT) {
       modalMode.value = MODES.EDIT
@@ -118,24 +121,12 @@ tinykeys(window, {
   },
   "Space =": () => {
     if (modalMode.value === MODES.PREVIEW) {
-      previewConfig.value = {
-        ...previewConfig.value,
-        cursor: {
-          ...previewConfig.value.cursor,
-          moveByPoint: previewConfig.value.cursor.moveByPoint + 50,
-        }
-      };
+      cursorJump.value = cursorJump.value + 50;
     }
   },
   "Space -": () => {
     if (modalMode.value === MODES.PREVIEW) {
-      previewConfig.value = {
-        ...previewConfig.value,
-        cursor: {
-          ...previewConfig.value.cursor,
-          moveByPoint: previewConfig.value.cursor.moveByPoint - 50,
-        }
-      }
+      cursorJump.value = cursorJump.value - 50;
     }
   },
   "l": () => {
@@ -144,10 +135,9 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          x: previewConfig.value.cursor.x + previewConfig.value.cursor.moveByPoint
+          x: previewConfig.value.cursor.x + cursorJump.value,
         }
       };
-      console.log(previewConfig.value.cursor.moveByPoint)
     }
   },
   "h": () => {
@@ -156,7 +146,7 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          x: previewConfig.value.cursor.x - previewConfig.value.cursor.moveByPoint,
+          x: previewConfig.value.cursor.x - cursorJump.value,
         }
       };
     }
@@ -167,7 +157,7 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          y: previewConfig.value.cursor.y - previewConfig.value.cursor.moveByPoint
+          y: previewConfig.value.cursor.y - cursorJump.value,
         }
       };
     }
@@ -178,7 +168,7 @@ tinykeys(window, {
         ...previewConfig.value,
         cursor: {
           ...previewConfig.value.cursor,
-          y: previewConfig.value.cursor.y + previewConfig.value.cursor.moveByPoint
+          y: previewConfig.value.cursor.y + cursorJump.value,
         }
       };
     }
@@ -186,13 +176,11 @@ tinykeys(window, {
   "1": () => {
     if (modalMode.value === MODES.PREVIEW) {
       selectedShape.value = SHAPES.TEXTBOX;
-      console.log("textbox change");
     }
   },
   "2": () => {
     if (modalMode.value === MODES.PREVIEW) {
       selectedShape.value = SHAPES.CIRCLE;
-      console.log("circle change");
     }
   },
 });
@@ -204,6 +192,7 @@ window.addEventListener('resize', () => {
 })
 
 if (submitbutton) submitbutton.addEventListener('click', handlesubmit);
+
 if (input) {
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handlesubmit();

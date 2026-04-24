@@ -6,7 +6,7 @@ stage.add(dotlayer);
 export const gridConfig = {
   gap: 50,
   radius: 3,
-  fill: '#0FBF3E',
+  fill: '#d4d4d4',
 }
 
 export function drawGrid() {
@@ -26,4 +26,5 @@ export function drawGrid() {
     }
   }
   dotlayer.draw();
+  dotlayer.moveToBottom();
 }
