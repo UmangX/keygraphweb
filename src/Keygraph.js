@@ -2,7 +2,7 @@
 import Konva from 'konva';
 import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
-import { MODES, previewConfig, modalMode, selectedShape, SHAPES, cursorJump } from './srcSignals';
+import { MODES, previewConfig, modalMode, selectedShape, SHAPES, cursorJump, primeNodes } from './srcSignals';
 import { stage, stageSetup, primeLayer } from './srcStage';
 import { drawGrid } from './srcGrid';
 import { addpreviewLayer, PreviewLayer, moveCursor } from './srcPreview';
@@ -16,7 +16,7 @@ const submitbutton = document.getElementById("submit-btn");
 const infoWindow = document.getElementById("infobar")
 const shapeDisplayWindow = document.getElementById("shapeDisplay")
 const shapeSizeDisplayWindow = document.getElementById("shapeSizeDisplay")
-
+const nodeBar = document.getElementById("node-bar")
 
 stageSetup()
 drawGrid()
@@ -26,7 +26,10 @@ addpreviewLayer()
 function handlesubmit() {
   const value = input.value.trim();
   if (selectedShape.value === SHAPES.TEXTBOX) {
-    primeLayer.add(generateTextbox(value));
+    const textBox = generateTextbox(value);
+    primeLayer.add(textBox);
+    console.log(textBox.id())
+    primeNodes.value = [...primeNodes.value, textBox.id()];
   }
   if (selectedShape.value === SHAPES.CIRCLE) {
     const circle = new Konva.Circle({
@@ -37,8 +40,10 @@ function handlesubmit() {
       radius: previewConfig.value.width,
       strokeWidth: 5,
       draggable: true,
+      shadowEnabled: true,
     })
     primeLayer.add(circle)
+    primeNodes.value = [...primeNodes.value, circle.id()];
     console.log("SHAPES.CIRCLE EXECUTED");
   }
   input.value = "";
@@ -54,10 +59,20 @@ function handlesubmit() {
 //   );
 // }
 
+
 effect(() => {
   //startup functions
   primeLayer.add(generateTextbox("Welcome to Keygraph,!", 10, 10));
 })
+
+effect(() => {
+  const listHTML = primeNodes.value
+    .map(node => `
+      <span id="node-bar-display">${node}</span>
+    `)
+    .join('');
+  nodeBar.innerHTML = listHTML || '<p>No nodes found</p>';
+});
 
 effect(() => {
   const _cshape = selectedShape.value;

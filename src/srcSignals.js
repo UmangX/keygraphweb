@@ -13,7 +13,9 @@ export const SHAPES = {
 }
 
 export const modalMode = signal(MODES.VIEW);
+
 export const selectedShape = signal(SHAPES.TEXTBOX)
+
 export const previewConfig = signal({
   height: 30,
   width: 30,
@@ -22,4 +24,7 @@ export const previewConfig = signal({
     y: window.innerHeight / 2,
   },
 });
+
 export const cursorJump = signal(100);
+
+export const primeNodes = signal([]);

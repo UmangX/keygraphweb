@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Mono:ital,wght@0,200..700;1,200..700&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
 /* ── Reset ───────────────────────────────────────────── */
 *,
@@ -36,7 +36,7 @@ html {
   --border-w: 1px;
   --anim: 0.1s linear;
   --popup-width: 320px;
-  --font: 'DM Mono', 'Courier New', monospace;
+  --font: 'Source Code Pro', 'Courier New', monospace;
 }
 
 /* ── Canvas ─────────────────────────────────────────── */
@@ -71,10 +71,9 @@ html {
   color: #333;
 }
 
-/* ── Floating bottom bar ────────────────────────────── */
 #bar {
   position: fixed;
-  bottom: 16px;
+  top: 16px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 48px);
@@ -452,4 +451,41 @@ html {
   font-family: var(--font);
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+
+#node-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+  max-width: 860px;
+  height: 38px;
+  z-index: 100;
+
+  background: var(--g1);
+  border: var(--border-w) solid var(--g5);
+  border-radius: 0;
+  color: var(--g9);
+  font-family: var(--font);
+
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 10px;
+
+  box-shadow: 3px 3px 0 var(--g0);
+}
+
+#node-bar span#node-bar-display {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--g7);
+  border-right: 1px solid var(--g5);
+  padding-right: 10px;
+  flex-shrink: 0;
 }

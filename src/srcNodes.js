@@ -37,21 +37,3 @@ export function generateTextbox(inputText, x = previewConfig.value.cursor.x, y =
   textgroup.add(complexText)
   return textgroup
 }
-
-export function generatePreviewTextBox() {
-  const rect = new Konva.Rect({
-    id: "preview",
-    x: previewConfig.value.cursor.x,
-    y: previewConfig.value.cursor.y,
-    stroke: '#30363d',
-    strokeWidth: 1,
-    fill: '#161b22',
-    width: previewConfig.value.width,
-    height: previewConfig.value.height,
-    shadowColor: 'black',
-    shadowBlur: 5,
-    //shadowOpacity: 0.3,
-    cornerRadius: 6,
-  });
-  return rect;
-}
