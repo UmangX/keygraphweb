@@ -1,13 +1,18 @@
 import { nanoid } from "nanoid";
-import { previewConfig } from "./srcSignals";
+import { previewConfig } from "./srcSignals"
 
-
-export function generateTextbox(inputText, x = previewConfig.value.cursor.x, y = previewConfig.value.cursor.y) {
+export function generateTextbox(
+  inputText,
+  x = previewConfig.value.cursor.x,
+  y = previewConfig.value.cursor.y,
+  onSelect = null
+) {
   const padding = 20;
+
   const complexText = new Konva.Text({
     text: inputText,
     fontSize: 20,
-    fontFamily: 'SauceCodePro Nerd Font,-apple-system, system-ui,sans-serif',
+    fontFamily: 'SauceCodePro Nerd Font,-apple-system, system-ui, sans-serif',
     fill: '#ffffff',
     padding: padding,
     align: 'center',
@@ -24,16 +29,13 @@ export function generateTextbox(inputText, x = previewConfig.value.cursor.x, y =
   });
 
   complexText.position({ x: padding, y: padding });
-
   const textgroup = new Konva.Group({
-    x: x,
-    y: y,
+    x, y,
     opacity: 1,
     id: nanoid(),
     draggable: true,
-  })
-
-  textgroup.add(rect)
-  textgroup.add(complexText)
-  return textgroup
+  });
+  textgroup.add(rect);
+  textgroup.add(complexText);
+  return textgroup;
 }

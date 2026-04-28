@@ -2,7 +2,7 @@
 import Konva from 'konva';
 import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
-import { MODES, previewConfig, modalMode, selectedShape, SHAPES, cursorJump, primeNodes } from './srcSignals';
+import { MODES, previewConfig, modalMode, selectedShape, SHAPES, cursorJump, primeNodes, primeIndex } from './srcSignals';
 import { stage, stageSetup, primeLayer } from './srcStage';
 import { drawGrid } from './srcGrid';
 import { addpreviewLayer, PreviewLayer, moveCursor } from './srcPreview';
@@ -22,14 +22,15 @@ stageSetup()
 drawGrid()
 addpreviewLayer()
 
-
-function handlesubmit() {
+export function handlesubmit() {
   const value = input.value.trim();
   if (selectedShape.value === SHAPES.TEXTBOX) {
-    const textBox = generateTextbox(value);
+    const textBox = generateTextbox(value, undefined, undefined, selectNode);
+    textBox.on('dragend', () => {
+      primeNodes.value = new Map(primeNodes.value).set(textBox.id(), textBox.getAttrs());
+    });
     primeLayer.add(textBox);
-    console.log(textBox.id())
-    primeNodes.value = [...primeNodes.value, textBox.id()];
+    primeNodes.value = new Map(primeNodes.value).set(textBox.id(), textBox.getAttrs());
   }
   if (selectedShape.value === SHAPES.CIRCLE) {
     const circle = new Konva.Circle({
@@ -42,34 +43,60 @@ function handlesubmit() {
       draggable: true,
       shadowEnabled: true,
     })
-    primeLayer.add(circle)
-    primeNodes.value = [...primeNodes.value, circle.id()];
-    console.log("SHAPES.CIRCLE EXECUTED");
+    circle.on('click tap', () => selectNode(circle.id()));
+    circle.on('dragend', () => {
+      primeNodes.value = new Map(primeNodes.value).set(circle.id(), circle.getAttrs());
+    });
+    primeLayer.add(circle);
+    primeNodes.value = new Map(primeNodes.value).set(circle.id(), circle.getAttrs());
   }
   input.value = "";
-  primeLayer.draw();
+  primeLayer.batchDraw();
 }
 
-// function haveIntersection(r1, r2) {
-//   return !(
-//     r2.x > r1.x + r1.width ||
-//     r2.x + r2.width < r1.x ||
-//     r2.y > r1.y + r1.height ||
-//     r2.y + r2.height < r1.y
-//   );
-// }
+export function selectNode(id) {
+  primeLayer.getChildren().forEach((node) => {
+    if (node.nodeType === "Group") {
+      node.getChildren().forEach((child) => {
+        if (child.getClassName() === "Rect") {
+          child.stroke('#30363d');
+          child.strokeWidth(1);
+        }
+      });
+    } else if (node.nodeType === "Shape") {
+      node.stroke('green');
+    }
+  });
+  primeIndex.value = id;
+  const selectedNode = primeLayer.findOne(`#${id}`);
+  if (selectedNode) {
+    if (selectedNode.nodeType === "Group") {
+      selectedNode.getChildren().forEach((child) => {
+        if (child.getClassName() === "Rect") {
+          child.stroke('#ffb000');
+          child.strokeWidth(2);
+        }
+      });
+    } else {
+      selectedNode.stroke('#ffb000');
+    }
+  }
+  primeLayer.batchDraw();
+}
 
+const startup = () => {
+  const node = generateTextbox("Welcome to Keygraph!", 10, 10);
+  node.on('dragend', () => {
+    primeNodes.value = new Map(primeNodes.value).set(node.id(), node.getAttrs());
+  });
+  primeLayer.add(node);
+  primeNodes.value = new Map(primeNodes.value).set(node.id(), node.getAttrs());
+}
+startup()
 
 effect(() => {
-  //startup functions
-  primeLayer.add(generateTextbox("Welcome to Keygraph,!", 10, 10));
-})
-
-effect(() => {
-  const listHTML = primeNodes.value
-    .map(node => `
-      <span id="node-bar-display">${node}</span>
-    `)
+  const listHTML = Array.from(primeNodes.value.entries())
+    .map(([id, attrs]) => `<span id="${id}">${id}</span>`)
     .join('');
   nodeBar.innerHTML = listHTML || '<p>No nodes found</p>';
 });
@@ -84,6 +111,7 @@ effect(() => {
   const _cheight = previewConfig.value.height;
   shapeSizeDisplayWindow.innerHTML = String(_cwidth + " " + _cheight);
 })
+
 
 effect(() => {
   const _cx = previewConfig.value.cursor.x;
@@ -104,11 +132,6 @@ effect(() => {
     PreviewLayer.hide();
   }
 })
-
-// const notTyping = () => {
-//   const tag = document.activeElement?.tagName;
-//   return tag !== 'INPUT' && tag !== 'TEXTAREA';
-// }
 
 tinykeys(window, {
   // edit MODES keybindings
@@ -197,6 +220,20 @@ tinykeys(window, {
     if (modalMode.value === MODES.PREVIEW) {
       selectedShape.value = SHAPES.CIRCLE;
     }
+  },
+  "Tab": event => {
+    event.preventDefault();
+    const ids = Array.from(primeNodes.value.keys());
+    if (ids.length === 0) return;
+    let currentIndex = ids.indexOf(primeIndex.value);
+    if (currentIndex === -1) {
+      currentIndex = 0;
+    } else {
+      currentIndex = (currentIndex + 1) % ids.length;
+    }
+    const nextId = ids[currentIndex];
+    selectNode(nextId);
+    console.log("Selected:", nextId);
   },
 });
 

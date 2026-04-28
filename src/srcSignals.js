@@ -20,11 +20,11 @@ export const previewConfig = signal({
   height: 30,
   width: 30,
   cursor: {
-    x: window.innerWidth / 2, // Fixed: x should typically align with width
+    x: window.innerWidth / 2,
     y: window.innerHeight / 2,
   },
 });
 
 export const cursorJump = signal(100);
-
-export const primeNodes = signal([]);
+export const primeNodes = signal(new Map());
+export const primeIndex = signal("");
