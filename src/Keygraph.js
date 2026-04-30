@@ -1,4 +1,3 @@
-// @ts-check
 import Konva from 'konva';
 import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
@@ -8,6 +7,7 @@ import { drawGrid } from './srcGrid';
 import { addpreviewLayer, PreviewLayer, moveCursor } from './srcPreview';
 import { generateTextbox } from './srcNodes';
 import { nanoid } from 'nanoid';
+import { switchPrime, selectNode } from './Utils';
 
 //dom elements
 const modeDisplay = document.getElementById("status-display")
@@ -25,10 +25,11 @@ addpreviewLayer()
 export function handlesubmit() {
   const value = input.value.trim();
   if (selectedShape.value === SHAPES.TEXTBOX) {
-    const textBox = generateTextbox(value, undefined, undefined, selectNode);
+    const textBox = generateTextbox(value, undefined, undefined);
     textBox.on('dragend', () => {
       primeNodes.value = new Map(primeNodes.value).set(textBox.id(), textBox.getAttrs());
     });
+    textBox.on('click tap', () => selectNode(textBox.id()));
     primeLayer.add(textBox);
     primeNodes.value = new Map(primeNodes.value).set(textBox.id(), textBox.getAttrs());
   }
@@ -54,35 +55,35 @@ export function handlesubmit() {
   primeLayer.batchDraw();
 }
 
-export function selectNode(id) {
-  primeLayer.getChildren().forEach((node) => {
-    if (node.nodeType === "Group") {
-      node.getChildren().forEach((child) => {
-        if (child.getClassName() === "Rect") {
-          child.stroke('#30363d');
-          child.strokeWidth(1);
-        }
-      });
-    } else if (node.nodeType === "Shape") {
-      node.stroke('green');
-    }
-  });
-  primeIndex.value = id;
-  const selectedNode = primeLayer.findOne(`#${id}`);
-  if (selectedNode) {
-    if (selectedNode.nodeType === "Group") {
-      selectedNode.getChildren().forEach((child) => {
-        if (child.getClassName() === "Rect") {
-          child.stroke('#ffb000');
-          child.strokeWidth(2);
-        }
-      });
-    } else {
-      selectedNode.stroke('#ffb000');
-    }
-  }
-  primeLayer.batchDraw();
-}
+// function selectNode(id) {
+//   primeLayer.getChildren().forEach((node) => {
+//     if (node.nodeType === "Group") {
+//       node.getChildren().forEach((child) => {
+//         if (child.getClassName() === "Rect") {
+//           child.stroke('#30363d');
+//           child.strokeWidth(1);
+//         }
+//       });
+//     } else if (node.nodeType === "Shape") {
+//       node.stroke('green');
+//     }
+//   });
+//   primeIndex.value = id;
+//   const selectedNode = primeLayer.findOne(`#${id}`);
+//   if (selectedNode) {
+//     if (selectedNode.nodeType === "Group") {
+//       selectedNode.getChildren().forEach((child) => {
+//         if (child.getClassName() === "Rect") {
+//           child.stroke('#ffb000');
+//           child.strokeWidth(2);
+//         }
+//       });
+//     } else {
+//       selectedNode.stroke('#ffb000');
+//     }
+//   }
+//   primeLayer.batchDraw();
+// }
 
 const startup = () => {
   const node = generateTextbox("Welcome to Keygraph!", 10, 10);
@@ -234,6 +235,46 @@ tinykeys(window, {
     const nextId = ids[currentIndex];
     selectNode(nextId);
     console.log("Selected:", nextId);
+  },
+  "r -": event => {
+    if (modalMode.value === MODES.EDIT) {
+      const id = primeIndex.value;
+      if (!id) return;
+      const currentNode = primeLayer.findOne("#" + id);
+      if (!currentNode) return;
+      const current = currentNode.scale();
+      const next = { x: current.x - 0.5, y: current.y - 0.5 };
+      currentNode.scale(next);
+      primeNodes.value = new Map(primeNodes.value).set(id, currentNode.getAttrs());
+      primeLayer.batchDraw();
+    }
+  },
+  "r =": event => {
+    if (modalMode.value === MODES.EDIT) {
+      const id = primeIndex.value;
+      if (!id) return;
+      const currentNode = primeLayer.findOne("#" + id);
+      if (!currentNode) return;
+      const current = currentNode.scale();
+      const next = { x: current.x + 0.5, y: current.y + 0.5 };
+      currentNode.scale(next);
+      primeNodes.value = new Map(primeNodes.value).set(id, currentNode.getAttrs());
+      primeLayer.batchDraw();
+    }
+  },
+  "x x": () => {
+    if (modalMode.value == MODES.PREVIEW) {
+      const id = primeIndex.value;
+      if (!id) return;
+      const currentNode = primeLayer.findOne("#" + id);
+      if (!currentNode) return;
+      switchPrime()
+      currentNode.destroy();
+      primeNodes.value.delete(id);
+      const _updatePrimeNodes = primeNodes.value;
+      primeNodes.value = new Map(_updatePrimeNodes);
+      primeLayer.batchDraw();
+    }
   },
 });
 

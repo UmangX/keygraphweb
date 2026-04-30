@@ -5,7 +5,6 @@ export function generateTextbox(
   inputText,
   x = previewConfig.value.cursor.x,
   y = previewConfig.value.cursor.y,
-  onSelect = null
 ) {
   const padding = 20;
 
@@ -17,7 +16,6 @@ export function generateTextbox(
     padding: padding,
     align: 'center',
   });
-
   const rect = new Konva.Rect({
     stroke: '#30363d',
     strokeWidth: 1,
@@ -27,7 +25,6 @@ export function generateTextbox(
     shadowColor: 'black',
     shadowBlur: 5,
   });
-
   complexText.position({ x: padding, y: padding });
   const textgroup = new Konva.Group({
     x, y,
