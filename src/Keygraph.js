@@ -289,7 +289,6 @@ tinykeys(window, {
       primeLayer.batchDraw();
     }
   },
-  
 });
 
 window.addEventListener('resize', () => {

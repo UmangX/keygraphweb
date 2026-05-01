@@ -20,5 +20,6 @@ export function moveCursor() {
     x: previewConfig.value.cursor.x,
     y: previewConfig.value.cursor.y,
   });
+  const cursorRect = cursor.getClientRect();
   PreviewLayer.batchDraw();
 }
