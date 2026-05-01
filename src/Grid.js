@@ -1,4 +1,4 @@
-import { stage } from "./srcStage";
+import { stage } from "./Stage";
 
 export const dotlayer = new Konva.Layer();
 stage.add(dotlayer);

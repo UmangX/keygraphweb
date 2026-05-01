@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { previewConfig } from "./srcSignals"
+import { previewConfig } from "./SignalOrigin"
 
 export function generateTextbox(
   inputText,

@@ -1,13 +1,13 @@
 import Konva from 'konva';
 import { effect } from '@preact/signals-core';
 import { tinykeys } from "tinykeys";
-import { MODES, previewConfig, modalMode, selectedShape, SHAPES, cursorJump, primeNodes, primeIndex } from './srcSignals';
-import { stage, stageSetup, primeLayer } from './srcStage';
-import { drawGrid } from './srcGrid';
-import { addpreviewLayer, PreviewLayer, moveCursor } from './srcPreview';
-import { generateTextbox } from './srcNodes';
+import { MODES, previewConfig, modalMode, selectedShape, SHAPES, cursorJump, primeNodes, primeIndex } from './SignalOrigin';
+import { stage, stageSetup, primeLayer } from './Stage';
+import { drawGrid } from './Grid';
+import { addpreviewLayer, PreviewLayer, moveCursor } from './Preview';
+import { generateTextbox } from './Textbox';
 import { nanoid } from 'nanoid';
-import { switchPrime, selectNode } from './Utils';
+import { switchPrime, selectNode, startup } from './Utils';
 
 //dom elements
 const modeDisplay = document.getElementById("status-display")
@@ -55,44 +55,6 @@ export function handlesubmit() {
   primeLayer.batchDraw();
 }
 
-// function selectNode(id) {
-//   primeLayer.getChildren().forEach((node) => {
-//     if (node.nodeType === "Group") {
-//       node.getChildren().forEach((child) => {
-//         if (child.getClassName() === "Rect") {
-//           child.stroke('#30363d');
-//           child.strokeWidth(1);
-//         }
-//       });
-//     } else if (node.nodeType === "Shape") {
-//       node.stroke('green');
-//     }
-//   });
-//   primeIndex.value = id;
-//   const selectedNode = primeLayer.findOne(`#${id}`);
-//   if (selectedNode) {
-//     if (selectedNode.nodeType === "Group") {
-//       selectedNode.getChildren().forEach((child) => {
-//         if (child.getClassName() === "Rect") {
-//           child.stroke('#ffb000');
-//           child.strokeWidth(2);
-//         }
-//       });
-//     } else {
-//       selectedNode.stroke('#ffb000');
-//     }
-//   }
-//   primeLayer.batchDraw();
-// }
-
-const startup = () => {
-  const node = generateTextbox("Welcome to Keygraph!", 10, 10);
-  node.on('dragend', () => {
-    primeNodes.value = new Map(primeNodes.value).set(node.id(), node.getAttrs());
-  });
-  primeLayer.add(node);
-  primeNodes.value = new Map(primeNodes.value).set(node.id(), node.getAttrs());
-}
 startup()
 
 effect(() => {

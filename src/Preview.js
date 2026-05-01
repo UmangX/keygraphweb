@@ -1,5 +1,6 @@
-import { stage } from "./srcStage";
-import { previewConfig } from "./srcSignals";
+import { primeLayer, stage } from "./Stage";
+import { previewConfig, primeIndex } from "./SignalOrigin";
+import Konva from "konva/lib/_CoreInternals";
 
 export const PreviewLayer = new Konva.Layer();
 export const addpreviewLayer = () => {
@@ -20,6 +21,9 @@ export function moveCursor() {
     x: previewConfig.value.cursor.x,
     y: previewConfig.value.cursor.y,
   });
-  const cursorRect = cursor.getClientRect();
+  primeLayer.getChildren().forEach(function (node) {
+    console.log(node.id());
+  }
+  )
   PreviewLayer.batchDraw();
 }

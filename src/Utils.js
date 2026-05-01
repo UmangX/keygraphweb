@@ -1,6 +1,6 @@
-import { primeIndex, primeNodes } from "./srcSignals";
-import { primeLayer } from "./srcStage";
-
+import { primeIndex, primeNodes } from "./SignalOrigin";
+import { primeLayer } from "./Stage";
+import { generateTextbox } from "./Textbox";
 
 export function selectNode(id) {
   primeLayer.getChildren().forEach((node) => {
@@ -15,6 +15,7 @@ export function selectNode(id) {
       node.stroke('green');
     }
   });
+
   primeIndex.value = id;
   const selectedNode = primeLayer.findOne(`#${id}`);
   if (selectedNode) {
@@ -44,4 +45,14 @@ export function switchPrime() {
   const nextId = ids[currentIndex];
   selectNode(nextId);
   console.log("Selected:", nextId);
+}
+
+
+export const startup = () => {
+  const node = generateTextbox("Welcome to Keygraph!", 10, 10);
+  node.on('dragend', () => {
+    primeNodes.value = new Map(primeNodes.value).set(node.id(), node.getAttrs());
+  });
+  primeLayer.add(node);
+  primeNodes.value = new Map(primeNodes.value).set(node.id(), node.getAttrs());
 }
