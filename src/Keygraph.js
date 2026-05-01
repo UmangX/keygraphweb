@@ -276,6 +276,20 @@ tinykeys(window, {
       primeLayer.batchDraw();
     }
   },
+  "p": () => {
+    if (modalMode.value == MODES.PREVIEW) {
+      const id = primeIndex.value;
+      if (!id) return;
+      const currentNode = primeLayer.findOne("#" + id);
+      currentNode.position({
+        x: previewConfig.value.cursor.x,
+        y: previewConfig.value.cursor.y,
+      })
+      primeNodes.value = new Map(primeNodes.value).set(id, currentNode.getAttrs());
+      primeLayer.batchDraw();
+    }
+  },
+  
 });
 
 window.addEventListener('resize', () => {

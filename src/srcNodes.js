@@ -6,11 +6,11 @@ export function generateTextbox(
   x = previewConfig.value.cursor.x,
   y = previewConfig.value.cursor.y,
 ) {
-  const padding = 20;
+  const padding = 5;
 
   const complexText = new Konva.Text({
     text: inputText,
-    fontSize: 20,
+    fontSize: 12,
     fontFamily: 'SauceCodePro Nerd Font,-apple-system, system-ui, sans-serif',
     fill: '#ffffff',
     padding: padding,
